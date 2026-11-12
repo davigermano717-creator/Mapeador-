@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MAPEADOR V2 — Editor visual</title>
+<style>
+:root{--bg:#0a101b;--p:#121d2d;--p2:#19283c;--line:#2a3e59;--txt:#edf4ff;--muted:#91a4bf;--blue:#469aff;--red:#ff4e59;--green:#43d49a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#172b49 0,transparent 35%),var(--bg);color:var(--txt);font:14px/1.45 system-ui,Arial,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}.app{max-width:1320px;margin:auto;padding:20px}.top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#287ee6,#16345d);display:grid;place-items:center;font-size:25px}.brand h1{margin:0;font-size:20px;letter-spacing:2px}.brand small,.muted{color:var(--muted)}.pill{padding:7px 11px;border-radius:99px;border:1px solid #28644f;background:#102a24;color:#76e4b6;font-size:12px}
+.layout{display:grid;grid-template-columns:205px minmax(0,1fr);gap:16px}.side,.panel{background:linear-gradient(180deg,#142136,#101927);border:1px solid var(--line);border-radius:17px}.side{padding:12px;height:max-content}.nav{display:block;width:100%;text-align:left;border:0;border-radius:10px;background:transparent;color:var(--muted);padding:12px;margin:3px 0}.nav.active,.nav:hover{background:#203958;color:white}.side .note{border-top:1px solid var(--line);margin-top:14px;padding:13px 7px 4px;color:var(--muted);font-size:11px}
+.main{min-width:0}.heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:2px 0 15px}.heading h2{margin:0;font-size:22px}.heading p{margin:4px 0 0;color:var(--muted)}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid #3973ad;background:#1c4d80;color:white;border-radius:9px;padding:9px 12px}.btn.alt{background:#17263a;border-color:var(--line);color:#cbdcf1}.btn.danger{background:#48232c;border-color:#85404c}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:13px}.stat{background:var(--p);border:1px solid var(--line);border-radius:13px;padding:13px}.stat small{display:block;color:var(--muted)}.stat b{display:block;font-size:21px;margin:3px 0}.cols{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(270px,.7fr);gap:13px}.panel{padding:15px;margin-bottom:13px}.panel h3{font-size:15px;margin:0 0 5px}.desc{font-size:12px;color:var(--muted);margin:0 0 13px}.toolbar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}.toolbar button{padding:8px 10px}.stage{height:430px;position:relative;overflow:hidden;border:1px solid #3a5270;border-radius:14px;background:linear-gradient(145deg,#15263b,#0d1726);touch-action:none}
+.stage:before{content:"";position:absolute;inset:0;background-image:linear-gradient(#47617a20 1px,transparent 1px),linear-gradient(90deg,#47617a20 1px,transparent 1px);background-size:10% 10%;pointer-events:none}
+.stage:after{content:"ÁREA DE SIMULAÇÃO • ARRASTE OS CONTROLES";position:absolute;bottom:9px;left:11px;color:#8297b4;font-size:10px;letter-spacing:.5px;pointer-events:none}
+.control{position:absolute;min-width:45px;min-height:45px;width:58px;height:58px;border:1px solid #6ab0ff;background:#1b5791cc;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;box-shadow:0 5px 18px #0007;touch-action:none;user-select:none;cursor:grab;z-index:2}
+.control.selected{outline:2px solid #fff;outline-offset:3px;box-shadow:0 0 0 5px #4597ff44,0 5px 18px #0008}.control .tiny{position:absolute;bottom:-17px;font-size:9px;font-weight:500;color:#d5e6ff;white-space:nowrap}.control .resize{position:absolute;right:-5px;bottom:-5px;width:14px;height:14px;border-radius:4px;background:#e8f3ff;border:2px solid #287bd2;cursor:nwse-resize}
+.control.move{background:#1e714fdd;border-color:#63e0ae;border-radius:13px}.control.aim{background:#573c91dd;border-color:#b7a1ff;border-radius:50%}.control.fire{background:#8b343ddd;border-color:#ff8b92;border-radius:50%}
+.redarrow{position:absolute;right:20%;top:22%;font-size:30px;color:var(--red);filter:drop-shadow(0 0 8px #ff4e59);pointer-events:none;z-index:1}
+.empty{position:absolute;inset:0;display:grid;place-items:center;color:#8297b4;text-align:center;padding:25px;pointer-events:none}
+.field{margin:12px 0}.fh{display:flex;justify-content:space-between;gap:10px;margin-bottom:6px}.val{color:#85bdff;font-weight:700;font-variant-numeric:tabular-nums}input[type=range]{width:100%;accent-color:var(--blue)}input[type=text],input[type=number],select{width:100%;background:#0c1624;color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:10px}
+.row{display:flex;gap:8px;align-items:center}.row>*{min-width:0}.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}.divider{height:1px;background:var(--line);margin:13px 0}.switchrow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}.switch{width:39px;height:22px;border:0;border-radius:99px;background:#3a506b;position:relative}.switch:after{content:"";position:absolute;width:16px;height:16px;top:3px;left:3px;background:white;border-radius:50%;transition:.18s}.switch.on{background:#247bd5}.switch.on:after{left:20px}
+.mappinglist{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.mapitem{background:#0c1726;border:1px solid var(--line);border-radius:10px;padding:9px;text-align:center}.mapitem b{display:block;font-size:16px}.mapitem small{color:var(--muted)}.mapitem button{margin-top:6px;font-size:11px;padding:5px 8px}
+.notice{background:#2b2517;border:1px solid #6e5b2d;color:#f2d99a;padding:11px;border-radius:11px;font-size:12px;line-height:1.5}.ok{color:var(--green)}.foot{text-align:center;color:#71839b;font-size:11px;padding:9px}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#1b3d61;border:1px solid #4c83ba;color:white;padding:10px 15px;border-radius:10px;opacity:0;transition:.2s;pointer-events:none}.toast.show{opacity:1}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.side{display:flex;overflow:auto;gap:3px;padding:7px}.nav{white-space:nowrap;width:auto;margin:0;padding:10px}.side .note{display:none}.cols{grid-template-columns:1fr}.stage{height:380px}}
+@media(max-width:500px){.app{padding:11px}.pill{display:none}.heading{align-items:flex-start;flex-direction:column}.heading h2{font-size:20px}.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{display:none}.stage{height:330px}.panel{padding:12px}}
+</style></head>
+<body><div class="app">
+<header class="top"><div class="brand"><div class="logo">⌖</div><div><h1>MAPEADOR</h1><small>V2 • EDITOR VISUAL</small></div></div><div class="pill">● Protótipo interativo</div></header>
+<div class="layout">
+<aside class="side">
+<button class="nav active" data-view="editor">▦　Editor visual</button>
+<button class="nav" data-view="sens">⌁　Sensibilidade</button>
+<button class="nav" data-view="profiles">▤　Perfis</button>
+<button class="nav" data-view="device">◉　Dispositivos</button>
+<button class="nav" data-view="help">ⓘ　Ajuda e permissões</button>
+<div class="note">MAPEADOR V2<br>Prévia funcional no navegador<br>Não é APK</div>
+</aside>
+<main class="main">
+<div class="heading"><div><h2 id="title">Editor de mapeamento</h2><p id="subtitle">Adicione controles e organize o layout na área de simulação.</p></div><div class="actions"><button class="btn alt" id="reset">Restaurar</button><button class="btn" id="save">Salvar perfil</button></div></div>
+<div class="stats"><div class="stat"><small>Perfil ativo</small><b id="profileName">FF Padrão</b><small class="ok">● Salvo neste navegador</small></div><div class="stat"><small>DPI do emulador</small><b id="dpiStat">800</b><small>Valor virtual de referência</small></div><div class="stat"><small>Controles no layout</small><b id="count">5</b><small>Itens editáveis</small></div></div>
+<div class="cols">
+<div>
+
+<section class="panel" id="emulatorXY">
+  <h3>🎯 Sensibilidade estilo emulador</h3>
+  <p class="desc">Digite os valores manualmente, como nos emuladores de PC. X controla o eixo horizontal e Y o vertical.</p>
+  <div class="field">
+    <div class="fh"><label for="manualX">X — Horizontal</label><span class="val">Eixo X</span></div>
+    <input id="manualX" type="number" min="0" max="10000" step="1" value="65" inputmode="numeric">
+  </div>
+  <div class="field">
+    <div class="fh"><label for="manualY">Y — Vertical</label><span class="val">Eixo Y</span></div>
+    <input id="manualY" type="number" min="0" max="10000" step="1" value="55" inputmode="numeric">
+  </div>
+  <div class="two">
+    <div class="field"><label for="xyMax">Limite da escala</label><select id="xyMax"><option value="100">0–100</option><option value="1000" selected>0–1000</option><option value="10000">0–10000</option></select></div>
+    <div class="field"><label>Entrada</label><input value="Manual" readonly></div>
+  </div>
+  <p class="desc" id="xyFeedback">X: 65 • Y: 55</p>
+</section>
+
+<section class="panel" id="editorPanel"><h3>🎮 Layout na tela</h3><p class="desc">Toque em um controle para selecionar. Arraste para mover; use a alça para redimensionar.</p>
+<div class="toolbar">
+<button class="btn" data-add="move">+ Movimento</button><button class="btn" data-add="aim">+ Mira</button><button class="btn" data-add="fire">+ Disparo</button><button class="btn alt" data-add="key">+ Tecla</button>
+<button class="btn alt" id="delete">Excluir selecionado</button>
+</div>
+<div class="stage" id="stage"><div class="redarrow" id="arrow">➤</div></div>
+</section>
+<section class="panel"><h3>⌨ Atalhos de teclado</h3><p class="desc">Atribuições ilustrativas para o layout.</p><div class="mappinglist" id="keylist"></div></section>
+</div>
+<div>
+<section class="panel"><h3>⚙ Controle selecionado</h3><p class="desc">Edite o nome, tecla e tamanho do item escolhido.</p>
+<div class="field"><div class="fh"><label>Tipo / nome</label></div><input id="controlName" type="text" placeholder="Selecione um controle"></div>
+<div class="field"><div class="fh"><label>Tecla ou botão do mouse</label></div><select id="binding"><option>Sem atribuição</option><option>W</option><option>A</option><option>S</option><option>D</option><option>SPACE</option><option>SHIFT</option><option>CTRL</option><option>Q</option><option>E</option><option>R</option><option>F</option><option>Mouse esquerdo</option><option>Mouse direito</option><option>Mouse meio</option><option>Botão lateral 1</option><option>Botão lateral 2</option></select></div>
+<div class="field"><div class="fh"><label>Tamanho</label><span class="val" id="sizeVal">58 px</span></div><input id="size" type="range" min="36" max="110" value="58"></div>
+<div class="field"><div class="fh"><label>Opacidade</label><span class="val" id="opacityVal">85%</span></div><input id="opacity" type="range" min="20" max="100" value="85"></div>
+<div class="notice">As mudanças aqui alteram apenas a demonstração do editor. Ainda não enviam comandos ao Free Fire.</div>
+</section>
+<section class="panel"><h3>🖱 Indicadores</h3>
+<div class="switchrow"><span>Seta vermelha do mouse</span><button class="switch on" id="arrowSwitch"></button></div>
+<div class="switchrow"><span>Grade de alinhamento</span><button class="switch on" id="gridSwitch"></button></div>
+<div class="switchrow"><span>Mostrar rótulos</span><button class="switch on" id="labelsSwitch"></button></div>
+</section>
+</div></div>
+<section class="panel" id="extraPanel"><h3 id="extraTitle">Configuração rápida</h3><p class="desc" id="extraDesc">Os controles podem ser ajustados individualmente.</p>
+<div id="extraContent"><p class="desc">Use os campos X e Y acima para digitar a sensibilidade diretamente, como em um emulador.</p></div>
+</section>
+<div class="foot">Protótipo V2 • Perfis e layout salvos localmente neste navegador • Nenhuma interação real com o jogo</div>
+</main></div></div><div class="toast" id="toast"></div>
+<script>
+const stage=document.getElementById('stage');let selected=null,items=[],profiles={};let drag=null;
+const defaults=[{id:1,n:'Movimento',t:'move',k:'WASD',x:12,y:58,s:82,o:85},{id:2,n:'Mira',t:'aim',k:'Mouse direito',x:77,y:42,s:68,o:85},{id:3,n:'Disparo',t:'fire',k:'Mouse esquerdo',x:88,y:72,s:62,o:90},{id:4,n:'Pular',t:'key',k:'SPACE',x:70,y:82,s:48,o:85},{id:5,n:'Recarregar',t:'key',k:'R',x:55,y:80,s:45,o:85}];
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function toast(m){let e=document.getElementById('toast');e.textContent=m;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1900)}
+function render(){stage.querySelectorAll('.control').forEach(e=>e.remove());items.forEach(it=>{let e=document.createElement('div');e.className='control '+it.t+(selected===it.id?' selected':'');e.dataset.id=it.id;e.style.left=it.x+'%';e.style.top=it.y+'%';e.style.width=it.s+'px';e.style.height=it.s+'px';e.style.opacity=it.o/100;e.style.transform='translate(-50%,-50%)';e.innerHTML='<span>'+esc(it.k==='Sem atribuição'?it.n.slice(0,2):it.k==='Mouse esquerdo'?'LMB':it.k==='Mouse direito'?'RMB':it.k)+'</span><span class="tiny">'+esc(it.n)+'</span><i class="resize"></i>';stage.appendChild(e)});document.getElementById('count').textContent=items.length;let it=items.find(x=>x.id===selected);document.getElementById('controlName').value=it?.n||'';document.getElementById('binding').value=it?.k||'Sem atribuição';document.getElementById('size').value=it?.s||58;document.getElementById('sizeVal').textContent=(it?.s||58)+' px';document.getElementById('opacity').value=it?.o||85;document.getElementById('opacityVal').textContent=(it?.o||85)+'%';renderKeys()}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function add(t){let id=Math.max(0,...items.map(x=>x.id))+1;let name={move:'Movimento',aim:'Mira',fire:'Disparo',key:'Novo botão'}[t];items.push({id,n:name,t,k:'Sem atribuição',x:50,y:50,s:58,o:85});selected=id;render();toast('Controle adicionado.')}
+function renderKeys(){let el=document.getElementById('keylist');el.innerHTML='';items.forEach(it=>{let d=document.createElement('div');d.className='mapitem';d.innerHTML='<b>'+esc(it.k)+'</b><small>'+esc(it.n)+'</small><br><button class="btn alt">Selecionar</button>';d.querySelector('button').onclick=()=>{selected=it.id;render()};el.appendChild(d)})}
+stage.addEventListener('pointerdown',e=>{let el=e.target.closest('.control');if(!el)return;let it=items.find(x=>x.id===+el.dataset.id);selected=it.id;let resizing=e.target.classList.contains('resize');drag={id:it.id,startX:e.clientX,startY:e.clientY,x:it.x,y:it.y,s:it.s,resizing,el};stage.querySelectorAll('.control').forEach(n=>n.classList.toggle('selected',n===el));document.getElementById('controlName').value=it.n;document.getElementById('binding').value=it.k;document.getElementById('size').value=it.s;document.getElementById('sizeVal').textContent=it.s+' px';document.getElementById('opacity').value=it.o;document.getElementById('opacityVal').textContent=it.o+'%';el.setPointerCapture(e.pointerId)});
+stage.addEventListener('pointermove',e=>{if(!drag)return;let it=items.find(x=>x.id===drag.id),el=drag.el;let r=stage.getBoundingClientRect();if(drag.resizing){it.s=Math.max(36,Math.min(110,drag.s+(e.clientX-drag.startX)));el.style.width=it.s+'px';el.style.height=it.s+'px';document.getElementById('size').value=it.s;document.getElementById('sizeVal').textContent=it.s+' px'}else{it.x=Math.max(3,Math.min(97,drag.x+(e.clientX-drag.startX)/r.width*100));it.y=Math.max(5,Math.min(94,drag.y+(e.clientY-drag.startY)/r.height*100));el.style.left=it.x+'%';el.style.top=it.y+'%'}});
+stage.addEventListener('pointerup',()=>{if(drag){drag=null;render()}});stage.addEventListener('pointercancel',()=>{drag=null;render()});
+document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>add(b.dataset.add));
+document.getElementById('delete').onclick=()=>{if(selected===null)return toast('Selecione um controle primeiro.');items=items.filter(x=>x.id!==selected);selected=null;render();toast('Controle removido do layout.')};
+document.getElementById('controlName').oninput=e=>{let it=items.find(x=>x.id===selected);if(it){it.n=e.target.value;renderKeys();let node=stage.querySelector('[data-id="'+it.id+'"] .tiny');if(node)node.textContent=it.n}};
+document.getElementById('binding').onchange=e=>{let it=items.find(x=>x.id===selected);if(it){it.k=e.target.value;render()}};
+document.getElementById('size').oninput=e=>{let it=items.find(x=>x.id===selected);if(it){it.s=+e.target.value;document.getElementById('sizeVal').textContent=it.s+' px';render()}};
+document.getElementById('opacity').oninput=e=>{let it=items.find(x=>x.id===selected);if(it){it.o=+e.target.value;document.getElementById('opacityVal').textContent=it.o+'%';render()}};
+document.getElementById('arrowSwitch').onclick=e=>{e.currentTarget.classList.toggle('on');document.getElementById('arrow').style.display=e.currentTarget.classList.contains('on')?'':'none'};
+document.getElementById('gridSwitch').onclick=e=>{e.currentTarget.classList.toggle('on');stage.style.backgroundImage=e.currentTarget.classList.contains('on')?'':'linear-gradient(145deg,#15263b,#0d1726)'};
+document.getElementById('labelsSwitch').onclick=e=>{e.currentTarget.classList.toggle('on');stage.querySelectorAll('.tiny').forEach(n=>n.style.display=e.currentTarget.classList.contains('on')?'':'none')};
+function save(){let name=document.getElementById('profileName').textContent;profiles[name]=clone(items);localStorage.setItem('mapeadorProfiles',JSON.stringify(profiles));toast('Perfil salvo neste navegador.')}
+document.getElementById('save').onclick=save;document.getElementById('reset').onclick=()=>{items=clone(defaults);selected=items[0].id;render();toast('Layout padrão restaurado.')};
+document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));b.classList.add('active');let v=b.dataset.view;let map={editor:['Editor de mapeamento','Adicione controles e organize o layout na área de simulação.'],sens:['Sensibilidade do mouse','Escalas virtuais de configuração para os eixos X e Y.'],profiles:['Perfis','Salve e recupere layouts de demonstração.'],device:['Dispositivos','Compatibilidade e conexão de periféricos.'],help:['Ajuda e permissões','O que o Android permite e o que ainda precisa ser implementado.']};document.getElementById('title').textContent=map[v][0];document.getElementById('subtitle').textContent=map[v][1];let content=document.getElementById('extraContent');if(v==='sens'){content.innerHTML='<div class="two"><div class="field"><div class="fh"><label>Sensibilidade X</label><b class="val" id="xv">6500</b></div><input id="xrange" type="range" min="0" max="10000" value="6500"></div><div class="field"><div class="fh"><label>Sensibilidade Y</label><b class="val" id="yv">5500</b></div><input id="yrange" type="range" min="0" max="10000" value="5500"></div></div><div class="field"><div class="fh"><label>DPI do emulador (virtual)</label><b class="val" id="dpiv">800</b></div><input id="dpirange" type="range" min="100" max="10000" value="800"></div><div class="notice">Esses valores são parâmetros do perfil. Não alteram o DPI físico do mouse nem a sensibilidade interna do Free Fire por conta própria.</div>';['xrange','yrange','dpirange'].forEach(id=>{let el=document.getElementById(id);el.oninput=()=>{document.getElementById(id==='xrange'?'xv':id==='yrange'?'yv':'dpiv').textContent=el.value;if(id==='dpirange')document.getElementById('dpiStat').textContent=el.value}})}else if(v==='profiles'){content.innerHTML='<div class="field"><label>Nome do perfil</label><input id="rename" value="'+esc(document.getElementById('profileName').textContent)+'"></div><div class="actions"><button class="btn" id="renameBtn">Renomear</button><button class="btn alt" id="duplicateBtn">Duplicar perfil</button><button class="btn alt" id="loadBtn">Carregar salvo</button></div><p class="desc">Os perfis são guardados localmente no navegador deste aparelho.</p>';document.getElementById('renameBtn').onclick=()=>{document.getElementById('profileName').textContent=document.getElementById('rename').value||'Meu perfil';toast('Nome atualizado.')};document.getElementById('duplicateBtn').onclick=()=>{let n=prompt('Nome do perfil duplicado','Cópia do perfil');if(n){profiles[n]=clone(items);document.getElementById('profileName').textContent=n;save()}};document.getElementById('loadBtn').onclick=()=>{let names=Object.keys(profiles);if(!names.length)return toast('Nenhum perfil salvo ainda.');let n=prompt('Digite um destes nomes:\n'+names.join('\n'),names[0]);if(profiles[n]){items=clone(profiles[n]);document.getElementById('profileName').textContent=n;selected=items[0]?.id??null;render();toast('Perfil carregado.')}}}else if(v==='device'){content.innerHTML='<div class="switchrow"><span>Mouse USB/Bluetooth detectado pelo sistema</span><b class="muted">A verificar no Android</b></div><div class="switchrow"><span>Teclado USB/Bluetooth</span><b class="muted">A verificar no Android</b></div><div class="notice">No Redmi Note 8 Pro, teste OTG e Bluetooth nas configurações do próprio Android. Este protótipo web não consegue confirmar os periféricos conectados ao telefone.</div>'}else if(v==='help'){content.innerHTML='<div class="notice"><b>Sobreposição:</b> um APK pode pedir permissão especial para desenhar por cima de outros apps. Isso só mostra a camada visual; não injeta automaticamente teclas ou toques no jogo.<br><br><b>Acessibilidade:</b> o Android oferece dispatchGesture para gestos, mas isso não equivale a uma API pública geral de injeção de teclado/mouse em qualquer jogo.<br><br><b>Próxima etapa nativa:</b> app Android em Kotlin, teste de entrada USB/Bluetooth, serviço de overlay e validação de compatibilidade sem contornar proteções.</div>'}else{content.innerHTML='<div class="two"><div class="field"><label>Sensibilidade X</label><input type="range" min="0" max="10000" value="6500"></div><div class="field"><label>Sensibilidade Y</label><input type="range" min="0" max="10000" value="5500"></div></div><p class="desc">Selecione um controle no editor para ajustar tecla, tamanho e opacidade.</p>'}document.getElementById('extraTitle').textContent=map[v][0]==='Editor de mapeamento'?'Configuração rápida':map[v][0];document.getElementById('extraDesc').textContent=v==='help'?'Limites técnicos e permissões do Android.':'Configurações demonstrativas do MAPEADOR.'});
+
+const manualX=document.getElementById('manualX'), manualY=document.getElementById('manualY'), xyMax=document.getElementById('xyMax');
+function syncXY(changed){
+  const max=Number(xyMax.value);
+  [manualX,manualY].forEach(el=>{
+    el.max=max;
+    if(el.value!=='' && Number(el.value)>max) el.value=max;
+    if(el.value!=='' && Number(el.value)<0) el.value=0;
+  });
+  document.getElementById('xyFeedback').textContent='X: '+(manualX.value||'—')+' • Y: '+(manualY.value||'—');
+}
+manualX.addEventListener('input',()=>syncXY('x'));
+manualY.addEventListener('input',()=>syncXY('y'));
+xyMax.addEventListener('change',()=>syncXY('scale'));
+
+try{profiles=JSON.parse(localStorage.getItem('mapeadorProfiles')||'{}')}catch(e){profiles={}}items=clone(defaults);selected=1;render();
+</script></body></html>
