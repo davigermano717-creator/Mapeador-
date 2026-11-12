@@ -1,41 +1,40 @@
+
 name: Build MAPEADOR APK
 
 on:
   push:
     branches: [ principal ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Baixar projeto
+        uses: actions/checkout@v4
 
-    - name: set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
 
-    - name: Organizar estrutura de pastas do Android
-      run: |
-        mkdir -p app/src/main
-        if [ -f app/AndroidManifest.xml ]; then
+      - name: Organizar arquivos Android
+        run: |
+          mkdir -p app/src/main/java/com/mapeador/app
+          mkdir -p app/src/main/assets
+
           mv app/AndroidManifest.xml app/src/main/
-        fi
-        if [ -f app/java ]; then
-          mv app/java app/src/main/
-        fi
-        if [ -f app/res ]; then
-          mv app/res app/src/main/
-        fi
+          mv app/MainActivity.kt app/src/main/java/com/mapeador/app/
+          mv app/mapeador.html app/src/main/assets/
 
-    - name: Build with Gradle
-      run: gradle assembleDebug
+      - name: Compilar APK
+        run: gradle assembleDebug
 
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-debug
-        path: "**/build/outputs/apk/debug/*.apk"
-        
+      - name: Salvar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MAPEADOR-debug
+          path: app/build/outputs/apk/debug/*.apk
+          
