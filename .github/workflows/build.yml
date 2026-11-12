@@ -17,6 +17,19 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
+    - name: Organizar estrutura de pastas do Android
+      run: |
+        mkdir -p app/src/main
+        if [ -f app/AndroidManifest.xml ]; then
+          mv app/AndroidManifest.xml app/src/main/
+        fi
+        if [ -f app/java ]; then
+          mv app/java app/src/main/
+        fi
+        if [ -f app/res ]; then
+          mv app/res app/src/main/
+        fi
+
     - name: Build with Gradle
       run: gradle assembleDebug
 
